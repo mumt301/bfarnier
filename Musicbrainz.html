@@ -1,0 +1,110 @@
+<html>
+   <head>
+       <title> Music Brainz</title>
+       <link rel="stylesheet" href="https://minicss.org/flavorFiles/mini-default.css">
+       <meta name="viewport" content="width=device-width, initial-scale=1">
+   </head> 
+   <body>
+       <div>
+        <h1>Musicbrainz API call - Retrieve Album by typing Artist name</h1>
+        <p> Retrieve album information by typing an artist/band name below!</p>
+        <!-- First, let's create the form-->
+        <form method="GET">
+            <label for="name"> Type Artist Name here!</label>
+            <input type="text" name="artist" id="name">
+            <input type="submit" value="Click to retrieve release data">
+        </form>
+        <p id="placeholder"> 
+            <table>
+                <tbody>
+                    <tr>
+                        <th>Album</th>
+                        <th>Released in</th>
+                    </tr>
+                </tbody>
+            </table>
+        </p>
+       </div>
+
+       <script type="text/Javascript">     
+            function queryArtist() {
+                let params = (new URL(document.location)).searchParams;
+                if (params.has('artist')) {
+                    let artistName = params.get('artist');
+                    httpGET("artist?query="+artistName, getMBID);
+                }
+            }
+
+            function httpGET(theURL, cbFunction) {
+                let mbBaseURL = "https://musicbrainz.org/ws/2/";
+                let queryURL = mbBaseURL + theURL;
+                let xmlHttp = new XMLHttpRequest();
+                xmlHttp.open("GET", queryURL);
+                    xmlHttp.send();
+
+                    xmlHttp.onreadystatechange = function () {
+                        if(this.readyState==4 && this.status==200) {
+                            cbFunction(this);
+                        }
+                    };
+            }
+
+            function getMBID(xhttp) {
+                let retrievedData=xhttp.responseXML;
+                let artistData = retrievedData.getElementsByTagName("artist")[0];
+                let artistMBID = artistData.id;
+                let artistCountry = artistData.getElementsByTagName('country')[0].innerHTML;
+                let artistName = artistData.getElementsByTagName('name')[0].innerHTML;
+
+               
+                httpGET("release-group?artist="+artistMBID+"&type=album|ep", getReleases);
+                
+            }
+
+            function getReleases(xhttp) {
+                let retrievedData=xhttp.responseXML;
+                releases=retrievedData.getElementsByTagName("release-group");
+                let placeholder = document.getElementById('placeholder');
+                let tableHTML = 
+                
+                `
+                <table>
+                    <tr>
+                        <th>Album Name</th>
+                        <th>Released in:</th>
+                    </tr>
+                `; 
+                let albumHTML;
+                let albumName;
+                let releaseDate;
+                for(row=0; row<releases.length;row++)
+                {
+                    albumHTML = releases[row];
+                    albumName = albumHTML.getElementsByTagName("title")[0].innerHTML;
+                    releaseDate = albumHTML.getElementsByTagName("first-release-date")[0].innerHTML;
+                    tableHTML += 
+                    `
+                    <tr>
+                        <td>${albumName}</td>
+                        <td>${releaseDate}</td>
+                    </tr>
+                    `;
+                }
+                
+
+
+                
+                tableHTML += `
+                </table>
+                `;
+                placeholder.innerHTML = tableHTML;
+
+            }
+
+            window.onload = queryArtist;  
+       </script>
+   </body>
+</html>
+
+
+

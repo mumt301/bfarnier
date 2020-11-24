@@ -6,15 +6,15 @@
             h1 {
                  text-align: center;
                  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
-                 color: rgba(0, 0, 0, 0.808);
+                 color: black;
                  font-size: 44px;
              }
              body, html {
                  height: 100%;
-                 font-size: 20px;
-                 font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+                 font-size: 22px;
+                 font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
                  color:black;
-                 line-height: 20px;
+                 line-height: 22px;
                  background-image: url(lastfm.png);
                  height: 100%;
                  background-position: center;
@@ -35,10 +35,10 @@
         <h1>Type the name of a song and its artist to find similar tracks!</h1>
 
         <form method="GET">
-            <label for="track">Track Title:</label>
+            <label for="track">Enter song title here:</label>
             <input type="text" name="trackName" id="track">
             <br>
-            <label for="artist">Artist:</label>
+            <label for="artist">Enter artist name here:</label>
             <input type="text" name="artistName" id="artist">
             <input type="submit">
         </form>
@@ -52,7 +52,6 @@
                 let params = (new URL(document.location)).searchParams;
                 if (params.has('artistName') && params.has('trackName')) {
                     let artistName = params.get('artistName');
-                    console.log(artistName);
                     let trackName = params.get('trackName');
                     console.log(trackName);
                     let queryURL = "https://ws.audioscrobbler.com/2.0/" + "?method=" + "track.getsimilar" + "&artist=" + artistName + "&track=" + trackName + "&api_key=" + apiKey;
@@ -81,7 +80,6 @@
             function getTrackInfoAndImage(xhttp) {
                 let retrievedData2 = xhttp.responseXML;
                 let bioContent = retrievedData2.getElementsByTagName('content')[0].innerHTML;
-                console.log(bioContent);
                 let infobox = document.getElementById('bioContainer');
                 let bio = document.createElement('p');
                 bio.innerHTML = bioContent;
